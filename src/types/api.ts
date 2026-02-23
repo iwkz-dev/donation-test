@@ -10,6 +10,7 @@ export interface DonationItem {
     price: number | null;
     uniqueCode: string;
     targetDonation: number | null;
+    requireDonatorInfo?: boolean;
     total_order?: number;
     total_donation?: number;
 }
@@ -65,6 +66,7 @@ export interface PaypalCheckoutItem {
     unique_code: string;
     total_order: number;
     total_price: number;
+    donator_info?: string;
 }
 
 export interface PaypalCheckoutRequest {
@@ -93,4 +95,19 @@ export interface CartItem {
     title: string;
     price: number;
     quantity: number;
+    requireDonatorInfo?: boolean;
+    donatorInfo?: string;
+}
+
+// ─── Admin Bank Transfer ───
+
+export interface BankTransferItem {
+    donation_code: string;
+    total_order: number;
+    total_price: number;
+    donator_info?: string;
+}
+
+export interface BankTransferRequest {
+    items: BankTransferItem[];
 }

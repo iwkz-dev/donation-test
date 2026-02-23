@@ -1,5 +1,5 @@
-import { create } from "zustand";
-import type { DonationPackage, CartItem } from "@/types/api";
+import { create } from 'zustand';
+import type { DonationPackage, CartItem } from '@/types/api';
 
 interface DonationState {
     // Selected package for the drawer
@@ -16,6 +16,7 @@ interface DonationState {
     openDrawer: (pkg: DonationPackage) => void;
     closeDrawer: () => void;
     setQuantity: (uniqueCode: string, quantity: number) => void;
+    setDonatorInfo: (uniqueCode: string, info: string) => void;
     setCustomAmount: (amount: number) => void;
     reset: () => void;
 
@@ -35,11 +36,16 @@ export const useDonationStore = create<DonationState>((set, get) => ({
         // We still map it so we can easily get the uniqueCode and price,
         // but cartItems might only be used for "subpackage" mode UI.
         const items: CartItem[] = pkg.donationItems.map((item) => {
-            const isFixedSingleItem = pkg.donationItems.length === 1 && item.price !== null && item.price > 1;
+            const isFixedSingleItem =
+                pkg.donationItems.length === 1 &&
+                item.price !== null &&
+                item.price > 1;
             return {
                 uniqueCode: item.uniqueCode,
                 title: item.title,
                 price: item.price ?? 0,
+                requireDonatorInfo: item.requireDonatorInfo,
+                donatorInfo: '',
                 // Default quantity to 1 if it's a fixed single item so they don't start at 0
                 quantity: isFixedSingleItem ? 1 : 0,
             };
@@ -61,7 +67,17 @@ export const useDonationStore = create<DonationState>((set, get) => ({
             cartItems: state.cartItems.map((item) =>
                 item.uniqueCode === uniqueCode
                     ? { ...item, quantity: Math.max(0, quantity) }
-                    : item
+                    : item,
+            ),
+        }));
+    },
+
+    setDonatorInfo: (uniqueCode, info) => {
+        set((state) => ({
+            cartItems: state.cartItems.map((item) =>
+                item.uniqueCode === uniqueCode
+                    ? { ...item, donatorInfo: info }
+                    : item,
             ),
         }));
     },
@@ -84,7 +100,11 @@ export const useDonationStore = create<DonationState>((set, get) => ({
         if (!selectedPackage) return 0;
 
         const singleItem = selectedPackage.donationItems[0];
-        const isFixedSingleItem = selectedPackage.donationItems.length === 1 && singleItem && singleItem.price !== null && singleItem.price > 1;
+        const isFixedSingleItem =
+            selectedPackage.donationItems.length === 1 &&
+            singleItem &&
+            singleItem.price !== null &&
+            singleItem.price > 1;
 
         if (selectedPackage.donationItems.length > 1 || isFixedSingleItem) {
             return cartItems.reduce((sum, item) => sum + item.quantity, 0);
@@ -97,12 +117,16 @@ export const useDonationStore = create<DonationState>((set, get) => ({
         if (!selectedPackage) return 0;
 
         const singleItem = selectedPackage.donationItems[0];
-        const isFixedSingleItem = selectedPackage.donationItems.length === 1 && singleItem && singleItem.price !== null && singleItem.price > 1;
+        const isFixedSingleItem =
+            selectedPackage.donationItems.length === 1 &&
+            singleItem &&
+            singleItem.price !== null &&
+            singleItem.price > 1;
 
         if (selectedPackage.donationItems.length > 1 || isFixedSingleItem) {
             return cartItems.reduce(
                 (sum, item) => sum + item.price * item.quantity,
-                0
+                0,
             );
         }
 

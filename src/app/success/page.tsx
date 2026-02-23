@@ -1,41 +1,45 @@
-"use client";
+'use client';
 
-import { useEffect, useState, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
-import { CheckCircle, Loader2, XCircle, ArrowLeft } from "lucide-react";
-import { capturePaypalPayment } from "@/lib/api";
-import Link from "next/link";
+import { useEffect, useState, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { CheckCircle, Loader2, XCircle, ArrowLeft } from 'lucide-react';
+import { capturePaypalPayment } from '@/lib/api';
+import Link from 'next/link';
 
-type CaptureStatus = "loading" | "success" | "error";
+type CaptureStatus = 'loading' | 'success' | 'error';
 
 function SuccessContent() {
     const searchParams = useSearchParams();
-    const token = searchParams.get("token");
-    const [status, setStatus] = useState<CaptureStatus>("loading");
+    const token = searchParams.get('token');
+    const [status, setStatus] = useState<CaptureStatus>('loading');
 
     useEffect(() => {
-        if (!token) {
-            setStatus("error");
-            return;
-        }
+        const capturePaypalPaymentWithToken = async () => {
+            if (!token) {
+                setStatus('error');
+                return;
+            }
 
-        capturePaypalPayment({ token })
-            .then((res) => {
-                if (res.ok) {
-                    setStatus("success");
-                } else {
-                    setStatus("error");
-                }
-            })
-            .catch(() => {
-                setStatus("error");
-            });
+            capturePaypalPayment({ token })
+                .then((res) => {
+                    if (res.ok) {
+                        setStatus('success');
+                    } else {
+                        setStatus('error');
+                    }
+                })
+                .catch(() => {
+                    setStatus('error');
+                });
+        };
+
+        capturePaypalPaymentWithToken();
     }, [token]);
 
     return (
         <main className="flex min-h-screen items-center justify-center bg-gray-50">
             <div className="mx-auto w-full max-w-md px-6">
-                {status === "loading" && (
+                {status === 'loading' && (
                     <div className="animate-fade-in text-center">
                         <div className="relative mx-auto mb-8 flex h-24 w-24 items-center justify-center">
                             <div className="absolute inset-0 rounded-full bg-emerald-100 animate-ping opacity-30" />
@@ -51,7 +55,7 @@ function SuccessContent() {
                     </div>
                 )}
 
-                {status === "success" && (
+                {status === 'success' && (
                     <div className="animate-fade-in text-center">
                         {/* Celebration background */}
                         <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -94,7 +98,7 @@ function SuccessContent() {
                     </div>
                 )}
 
-                {status === "error" && (
+                {status === 'error' && (
                     <div className="animate-fade-in text-center">
                         <div className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-red-50">
                             <XCircle className="h-12 w-12 text-red-400" />
@@ -103,8 +107,8 @@ function SuccessContent() {
                             Something went wrong
                         </h1>
                         <p className="mt-3 text-sm text-gray-500">
-                            We couldn&apos;t verify your donation. If you were charged, please
-                            contact us for assistance.
+                            We couldn&apos;t verify your donation. If you were
+                            charged, please contact us for assistance.
                         </p>
                         <Link
                             href="/"
