@@ -142,7 +142,9 @@ export function CheckoutDrawer() {
                         unique_code: item.uniqueCode,
                         total_order: item.quantity,
                         total_price: item.price * item.quantity,
+                        // Send donor info under both legacy and new key
                         donator_info: item.donatorInfo?.trim(),
+                        description: item.donatorInfo?.trim(),
                     });
                 });
         } else if (selectedPackage) {
@@ -151,10 +153,12 @@ export function CheckoutDrawer() {
                 unique_code: mainItem?.uniqueCode ?? '',
                 total_order: 1,
                 total_price: totalPrice,
+                // Send donor info under both legacy and new key
                 donator_info: cartItems[0]?.donatorInfo?.trim(),
+                description: cartItems[0]?.donatorInfo?.trim(),
             });
         }
-
+        console.log(items);
         await submitPaypalCheckout({
             total_order: totalQuantity,
             total_price: totalPrice,
@@ -403,16 +407,13 @@ export function CheckoutDrawer() {
                                                         PayPal Fee{' '}
                                                         <span className="text-xs text-gray-400">
                                                             (
-                                                            {(
-                                                                config.paypal
-                                                                    .percentageFee /
-                                                                100
-                                                            ).toFixed(2)}
+                                                            {config.paypal.percentageFee.toFixed(
+                                                                2,
+                                                            )}
                                                             % +{' '}
                                                             {formatCurrency(
                                                                 config.paypal
-                                                                    .fixFee /
-                                                                    100,
+                                                                    .fixFee,
                                                             )}
                                                             )
                                                         </span>

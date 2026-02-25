@@ -1,12 +1,9 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useCallback } from "react";
-import { toast } from "sonner";
-import type {
-    PaymentConfigData,
-    PaypalCheckoutRequest,
-} from "@/types/api";
-import { fetchPaymentConfig, createPaypalCheckout } from "@/lib/api";
+import { useState, useEffect, useCallback } from 'react';
+import { toast } from 'sonner';
+import type { PaymentConfigData, PaypalCheckoutRequest } from '@/types/api';
+import { fetchPaymentConfig, createPaypalCheckout } from '@/lib/api';
 
 export function usePayment() {
     const [config, setConfig] = useState<PaymentConfigData | null>(null);
@@ -21,7 +18,7 @@ export function usePayment() {
             })
             .catch((err) => {
                 console.error(err);
-                toast.error("Failed to load payment configuration");
+                toast.error('Failed to load payment configuration');
             })
             .finally(() => {
                 if (!cancelled) setConfigLoading(false);
@@ -35,9 +32,9 @@ export function usePayment() {
         (subtotal: number) => {
             if (!config) return { fee: 0, total: subtotal };
             const { fixFee, percentageFee } = config.paypal;
-            // fixFee is in cents, percentageFee is in basis points (249 = 2.49%)
-            const fixFeeEuro = fixFee / 100;
-            const percentageRate = percentageFee / 10000;
+            // API now returns fee in EUR and percentage as plain percent (e.g. 2.5 => 2.5%)
+            const fixFeeEuro = fixFee;
+            const percentageRate = percentageFee / 100;
             // Total = (subtotal + fixFee) / (1 - rate)  to cover the fee
             const total = (subtotal + fixFeeEuro) / (1 - percentageRate);
             const fee = total - subtotal;
@@ -46,7 +43,7 @@ export function usePayment() {
                 total: Math.round(total * 100) / 100,
             };
         },
-        [config]
+        [config],
     );
 
     const submitPaypalCheckout = useCallback(
@@ -57,16 +54,16 @@ export function usePayment() {
                 if (res.data.paypal_link) {
                     window.location.href = res.data.paypal_link;
                 } else {
-                    toast.error("No PayPal link received. Please try again.");
+                    toast.error('No PayPal link received. Please try again.');
                 }
             } catch (err) {
                 console.error(err);
-                toast.error("Checkout failed. Please try again.");
+                toast.error('Checkout failed. Please try again.');
             } finally {
                 setLoading(false);
             }
         },
-        []
+        [],
     );
 
     return {

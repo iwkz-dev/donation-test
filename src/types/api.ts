@@ -67,6 +67,7 @@ export interface PaypalCheckoutItem {
     total_order: number;
     total_price: number;
     donator_info?: string;
+    description?: string;
 }
 
 export interface PaypalCheckoutRequest {
