@@ -163,7 +163,7 @@ export default function AdminDashboard() {
                     donation_code: r.donation_code,
                     total_order: Number(r.total_order),
                     total_price: Number(r.total_price),
-                    donator_info: r.donator_info.trim() || undefined,
+                    description: r.donator_info.trim() || undefined,
                 })),
         };
 
